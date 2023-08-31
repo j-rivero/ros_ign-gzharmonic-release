@@ -1,3 +1,32 @@
+## ros_gz (iron) - 0.246.0-1
+
+The packages in the `ros_gz` repository were released into the `iron` distro by running `/usr/bin/bloom-release --no-pull-request --rosdistro iron --track iron_gzharmonic --override-release-repository-url https://github.com/j-rivero/ros_ign-gzharmonic-release ros_gz` on `Thu, 31 Aug 2023 18:31:02 -0000`
+
+These packages were released:
+- `ros_gz`
+- `ros_gz_bridge`
+- `ros_gz_image`
+- `ros_gz_interfaces`
+- `ros_gz_sim`
+- `ros_gz_sim_demos`
+
+Version of package(s) in repository `ros_gz`:
+
+- upstream repository: https://github.com/gazebosim/ros_gz
+- release repository: https://github.com/ros2-gbp/ros_ign-release.git
+- rosdistro version: `0.245.0-1`
+- old version: `0.245.0-1004`
+- new version: `0.246.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.11.2`
+- catkin_pkg version: `0.5.2`
+- rosdep version: `0.22.2`
+- rosdistro version: `0.9.0`
+- vcstools version: `0.1.42`
+
+
 ## ros_gz (iron) - 0.245.0-1004
 
 The packages in the `ros_gz` repository were released into the `iron` distro by running `/usr/bin/bloom-release --no-pull-request --rosdistro iron --track iron_gzharmonic --override-release-repository-url https://github.com/j-rivero/ros_ign-gzharmonic-release ros_gz` on `Wed, 30 Aug 2023 20:57:36 -0000`
