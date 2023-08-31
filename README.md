@@ -1,290 +1,133 @@
-# Bridge communication between ROS and Gazebo
-
-This package provides a network bridge which enables the exchange of messages
-between ROS and Gazebo Transport.
-
-The following message types can be bridged for topics:
-
-| ROS type                                     | Gazebo Transport Type          |
-|----------------------------------------------|:------------------------------:|
-| builtin_interfaces/msg/Time                  | gz.msgs.Time                   |
-| geometry_msgs/msg/Point                      | gz.msgs.Vector3d               |
-| geometry_msgs/msg/Pose                       | gz.msgs.Pose                   |
-| geometry_msgs/msg/PoseArray                  | gz.msgs.Pose_V                 |
-| geometry_msgs/msg/PoseStamped                | gz.msgs.Pose                   |
-| geometry_msgs/msg/PoseWithCovariance         | gz.msgs.PoseWithCovariance     |
-| geometry_msgs/msg/Quaternion                 | gz.msgs.Quaternion             |
-| geometry_msgs/msg/Transform                  | gz.msgs.Pose                   |
-| geometry_msgs/msg/TransformStamped           | gz.msgs.Pose                   |
-| geometry_msgs/msg/Twist                      | gz.msgs.Twist                  |
-| geometry_msgs/msg/TwistWithCovariance        | gz.msgs.TwistWithCovariance    |
-| geometry_msgs/msg/TwistWithCovarianceStamped | gz.msgs.TwistWithCovariance    |
-| geometry_msgs/msg/Vector3                    | gz.msgs.Vector3d               |
-| geometry_msgs/msg/Wrench                     | gz.msgs.Wrench                 |
-| geometry_msgs/msg/WrenchStamped              | gz.msgs.Wrench                 |
-| nav_msgs/msg/Odometry                        | gz.msgs.Odometry               |
-| nav_msgs/msg/Odometry                        | gz.msgs.OdometryWithCovariance |
-| rcl_interfaces/msg/ParameterValue            | gz.msgs.Any                    |
-| ros_gz_interfaces/msg/Altimeter              | gz.msgs.Altimeter              |
-| ros_gz_interfaces/msg/Contact                | gz.msgs.Contact                |
-| ros_gz_interfaces/msg/Contacts               | gz.msgs.Contacts               |
-| ros_gz_interfaces/msg/Dataframe              | gz.msgs.Dataframe              |
-| ros_gz_interfaces/msg/Entity                 | gz.msgs.Entity                 |
-| ros_gz_interfaces/msg/Float32Array           | gz.msgs.Float_V                |
-| ros_gz_interfaces/msg/GuiCamera              | gz.msgs.GUICamera              |
-| ros_gz_interfaces/msg/JointWrench            | gz.msgs.JointWrench            |
-| ros_gz_interfaces/msg/Light                  | gz.msgs.Light                  |
-| ros_gz_interfaces/msg/SensorNoise            | gz.msgs.SensorNoise            |
-| ros_gz_interfaces/msg/StringVec              | gz.msgs.StringMsg_V            |
-| ros_gz_interfaces/msg/TrackVisual            | gz.msgs.TrackVisual            |
-| ros_gz_interfaces/msg/VideoRecord            | gz.msgs.VideoRecord            |
-| ros_gz_interfaces/msg/WorldControl           | gz.msgs.WorldControl           |
-| rosgraph_msgs/msg/Clock*                     | gz.msgs.Clock*                 |
-| sensor_msgs/msg/BatteryState                 | gz.msgs.BatteryState           |
-| sensor_msgs/msg/CameraInfo                   | gz.msgs.CameraInfo             |
-| sensor_msgs/msg/FluidPressure                | gz.msgs.FluidPressure          |
-| sensor_msgs/msg/Image                        | gz.msgs.Image                  |
-| sensor_msgs/msg/Imu                          | gz.msgs.IMU                    |
-| sensor_msgs/msg/JointState                   | gz.msgs.Model                  |
-| sensor_msgs/msg/Joy                          | gz.msgs.Joy                    |
-| sensor_msgs/msg/LaserScan                    | gz.msgs.LaserScan              |
-| sensor_msgs/msg/MagneticField                | gz.msgs.Magnetometer           |
-| sensor_msgs/msg/NavSatFix                    | gz.msgs.NavSat                 |
-| sensor_msgs/msg/PointCloud2                  | gz.msgs.PointCloudPacked       |
-| std_msgs/msg/Bool                            | gz.msgs.Boolean                |
-| std_msgs/msg/ColorRGBA                       | gz.msgs.Color                  |
-| std_msgs/msg/Empty                           | gz.msgs.Empty                  |
-| std_msgs/msg/Float32                         | gz.msgs.Float                  |
-| std_msgs/msg/Float64                         | gz.msgs.Double                 |
-| std_msgs/msg/Header                          | gz.msgs.Header                 |
-| std_msgs/msg/Int32                           | gz.msgs.Int32                  |
-| std_msgs/msg/String                          | gz.msgs.StringMsg              |
-| std_msgs/msg/UInt32                          | gz.msgs.UInt32                 |
-| tf2_msgs/msg/TFMessage                       | gz.msgs.Pose_V                 |
-| trajectory_msgs/msg/JointTrajectory          | gz.msgs.JointTrajectory        |
-
-And the following for services:
-
-| ROS type                             | Gazebo request             | Gazebo response       |
-|--------------------------------------|:--------------------------:| --------------------- |
-| ros_gz_interfaces/srv/ControlWorld   | gz.msgs.WorldControl       | gz.msgs.Boolean       |
-
-Run `ros2 run ros_gz_bridge parameter_bridge -h` for instructions.
-
-**NOTE**: If during startup, gazebo detects that there is another publisher on `/clock`, it will only create the fully qualified `/world/<worldname>/clock topic`.
-Gazebo would be the only `/clock` publisher, the sole source of clock information.
-
-You should create an unidirectional `/clock` bridge:
-
-```bash
-ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock
-```
-
-## Example 1a: Gazebo Transport talker and ROS 2 listener
-
-Start the parameter bridge which will watch the specified topics.
-
-```
-# Shell A:
-. ~/bridge_ws/install/setup.bash
-ros2 run ros_gz_bridge parameter_bridge /chatter@std_msgs/msg/String@ignition.msgs.StringMsg
-```
-
-Now we start the ROS listener.
-
-```
-# Shell B:
-. /opt/ros/galactic/setup.bash
-ros2 topic echo /chatter
-```
-
-Now we start the Gazebo Transport talker.
+[![Build Status](https://github.com/gazebosim/ros_gz/actions/workflows/ros2-ci.yml/badge.svg?branch=ros2)](https://github.com/gazebosim/ros_gz/actions/workflows/ros2-ci.yml)
 
-```
-# Shell C:
-ign topic -t /chatter -m ignition.msgs.StringMsg -p 'data:"Hello"'
-```
+ROS 2 version | Gazebo version | Branch | Binaries hosted at
+-- | -- | -- | --
+Foxy | Citadel | [foxy](https://github.com/gazebosim/ros_gz/tree/foxy) | https://packages.ros.org
+Foxy | Edifice | [foxy](https://github.com/gazebosim/ros_gz/tree/foxy) | only from source
+Galactic | Edifice | [galactic](https://github.com/gazebosim/ros_gz/tree/galactic) | https://packages.ros.org
+Galactic | Fortress | [galactic](https://github.com/gazebosim/ros_gz/tree/galactic) | only from source
+Humble | Fortress | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | https://packages.ros.org
+Humble | Garden | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | only from source
+Iron | Fortress | [iron](https://github.com/gazebosim/ros_gz/tree/iron) | https://packages.ros.org
+Iron | Garden | [iron](https://github.com/gazebosim/ros_gz/tree/iron) | only from source
+Rolling | Edifice | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
+Rolling | Fortress | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | https://packages.ros.org
+Rolling | Garden | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
 
-## Example 1b: ROS 2 talker and Gazebo Transport listener
 
-Start the parameter bridge which will watch the specified topics.
+For information on ROS(1) and Gazebo compatibility, refer to the [noetic branch README](https://github.com/gazebosim/ros_gz/tree/noetic)
 
-```
-# Shell A:
-. ~/bridge_ws/install/setup.bash
-ros2 run ros_gz_bridge parameter_bridge /chatter@std_msgs/msg/String@ignition.msgs.StringMsg
-```
+> Please [ticket an issue](https://github.com/gazebosim/ros_gz/issues/) if you'd like support to be added for some combination.
 
-Now we start the Gazebo Transport listener.
+[Details about the renaming process](README_RENAME.md) from `ign` to `gz` .
 
-```
-# Shell B:
-ign topic -e -t /chatter
-```
+**Note**: The `ros_ign` prefixed packages are shim packages that redirect to their `ros_gz` counterpart.
+Under most circumstances you want to be using the `ros_gz` counterpart.
 
-Now we start the ROS talker.
+# Integration between ROS and Gazebo
 
-```
-# Shell C:
-. /opt/ros/galactic/setup.bash
-ros2 topic pub /chatter std_msgs/msg/String "data: 'Hi'" --once
-```
+## Packages
 
-## Example 2: Run the bridge and exchange images
+This repository holds packages that provide integration between
+[ROS](http://www.ros.org/) and [Gazebo](https://gazebosim.org):
 
-In this example, we're going to generate Gazebo Transport images using
-Gazebo Sim, that will be converted into ROS images, and visualized with
-`rqt_image_viewer`.
+* [ros_gz](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz):
+  Metapackage which provides all the other packages.
+* [ros_gz_image](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz_image):
+  Unidirectional transport bridge for images from
+  [Gazebo Transport](https://gazebosim.org/libs/transport)
+  to ROS using
+  [image_transport](http://wiki.ros.org/image_transport).
+* [ros_gz_bridge](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz_bridge):
+  Bidirectional transport bridge between
+  [Gazebo Transport](https://gazebosim.org/libs/transport)
+  and ROS.
+* [ros_gz_sim](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz_sim):
+  Convenient launch files and executables for using
+  [Gazebo Sim](https://gazebosim.org/libs/gazebo)
+  with ROS.
+* [ros_gz_sim_demos](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz_sim_demos):
+  Demos using the ROS-Gazebo integration.
+* [ros_gz_point_cloud](https://github.com/gazebosim/ros_gz/tree/ros2/ros_gz_point_cloud):
+  Plugins for publishing point clouds to ROS from
+  [Gazebo Sim](https://gazebosim.org/libs/gazebo) simulations.
 
-First we start Gazebo Sim (don't forget to hit play, or Gazebo Sim won't generate any images).
+## Install
 
-```
-# Shell A:
-ign gazebo sensors_demo.sdf
-```
+This branch supports ROS Rolling. See above for other ROS versions.
 
-Let's see the topic where camera images are published.
+### Binaries
 
-```
-# Shell B:
-ign topic -l | grep image
-/rgbd_camera/depth_image
-/rgbd_camera/image
-```
+Rolling binaries are available for Fortress.
+They are hosted at https://packages.ros.org.
 
-Then we start the parameter bridge with the previous topic.
+1. Add https://packages.ros.org
 
-```
-# Shell B:
-. ~/bridge_ws/install/setup.bash
-ros2 run ros_gz_bridge parameter_bridge /rgbd_camera/image@sensor_msgs/msg/Image@ignition.msgs.Image
-```
+        sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+        curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+        sudo apt-get update
 
-Now we start the ROS GUI:
+1. Install `ros_gz`
 
-```
-# Shell C:
-. /opt/ros/galactic/setup.bash
-ros2 run rqt_image_view rqt_image_view /rgbd_camera/image
-```
+        sudo apt install ros-rolling-ros-gz
 
-You should see the current images in `rqt_image_view` which are coming from
-Gazebo (published as Gazebo Msgs over Gazebo Transport).
+### From source
 
-The screenshot shows all the shell windows and their expected content
-(it was taken using ROS 2 Galactic and Gazebo Fortress):
+#### ROS
 
-![Gazebo Transport images and ROS rqt](images/bridge_image_exchange.png)
+Be sure you've installed
+[ROS Rolling](https://index.ros.org/doc/ros2/Installation/)
+(at least ROS-Base). More ROS dependencies will be installed below.
 
-## Example 3: Static bridge
+#### Gazebo
 
-In this example, we're going to run an executable that starts a bidirectional
-bridge for a specific topic and message type. We'll use the `static_bridge`
-executable that is installed with the bridge.
+Install either [Edifice, Fortress, or Garden](https://gazebosim.org/docs).
 
-The example's code can be found under `ros_gz_bridge/src/static_bridge.cpp`.
-In the code, it's possible to see how the bridge is hardcoded to bridge string
-messages published on the `/chatter` topic.
+Set the `GZ_VERSION` environment variable to the Gazebo version you'd
+like to compile against. For example:
 
-Let's give it a try, starting with Gazebo -> ROS 2.
+    export GZ_VERSION=edifice
 
-On terminal A, start the bridge:
+> You only need to set this variable when compiling, not when running.
 
-`ros2 run ros_gz_bridge static_bridge`
+#### Compile ros_gz
 
-On terminal B, we start a ROS 2 listener:
+The following steps are for Linux and OSX.
 
-`ros2 topic echo /chatter std_msgs/msg/String`
+1. Create a colcon workspace:
 
-And terminal C, publish an Gazebo message:
+    ```
+    # Setup the workspace
+    mkdir -p ~/ws/src
+    cd ~/ws/src
 
-`ign topic -t /chatter -m ignition.msgs.StringMsg -p 'data:"Hello"'`
+    # Download needed software
+    git clone https://github.com/gazebosim/ros_gz.git -b ros2
+    ```
 
-At this point, you should see the ROS 2 listener echoing the message.
+1. Install dependencies (this may also install Gazebo):
 
-Now let's try the other way around, ROS 2 -> Gazebo.
+    ```
+    cd ~/ws
+    rosdep install -r --from-paths src -i -y --rosdistro humble
+    ```
 
-On terminal D, start an Igntion listener:
+    > If `rosdep` fails to install Gazebo libraries and you have not installed them before, please follow [Gazebo installation instructions](https://gazebosim.org/docs/latest/install).
 
-`ign topic -e -t /chatter`
+1. Build the workspace:
 
-And on terminal E, publish a ROS 2 message:
+    ```
+    # Source ROS distro's setup.bash
+    source /opt/ros/<distro>/setup.bash
 
-`ros2 topic pub /chatter std_msgs/msg/String 'data: "Hello"' -1`
+    # Build and install into workspace
+    cd ~/ws
+    colcon build
+    ```
 
-You should see the Gazebo listener echoing the message.
+## ROSCon 2022
 
-## Example 4: Service bridge
+[![](img/video_img.png)](https://vimeo.com/showcase/9954564/video/767127300)
 
-It's possible to make ROS service requests into Gazebo. Let's try unpausing the simulation.
-
-On terminal A, start the service bridge:
-
-`ros2 run ros_gz_bridge parameter_bridge /world/shapes/control@ros_gz_interfaces/srv/ControlWorld`
-
-On terminal B, start Gazebo, it will be paused by default:
-
-`ign gazebo shapes.sdf`
-
-On terminal C, make a ROS request to unpause simulation:
-
-```
-ros2 service call /world/<world_name>/control ros_gz_interfaces/srv/ControlWorld "{world_control: {pause: false}}"
-```
-
-## Example 5: Configuring the Bridge via YAML
-
-When configuring many topics, it is easier to use a file-based configuration in a markup
-language. In this case, the `ros_gz` bridge supports using a YAML file to configure the
-various parameters.
-
-The configuration file must be a YAML array of maps.
-An example configuration for 5 bridges is below, showing the various ways that a
-bridge may be specified:
-
-```yaml
- # Set just topic name, applies to both
-- topic_name: "chatter"
-  ros_type_name: "std_msgs/msg/String"
-  gz_type_name: "ignition.msgs.StringMsg"
-
-# Set just ROS topic name, applies to both
-- ros_topic_name: "chatter_ros"
-  ros_type_name: "std_msgs/msg/String"
-  gz_type_name: "ignition.msgs.StringMsg"
-
-# Set just GZ topic name, applies to both
-- gz_topic_name: "chatter_ign"
-  ros_type_name: "std_msgs/msg/String"
-  gz_type_name: "ignition.msgs.StringMsg"
-
-# Set each topic name explicitly
-- ros_topic_name: "chatter_both_ros"
-  gz_topic_name: "chatter_both_ign"
-  ros_type_name: "std_msgs/msg/String"
-  gz_type_name: "ignition.msgs.StringMsg"
-
-# Full set of configurations
-- ros_topic_name: "ros_chatter"
-  gz_topic_name: "ign_chatter"
-  ros_type_name: "std_msgs/msg/String"
-  gz_type_name: "ignition.msgs.StringMsg"
-  subscriber_queue: 5       # Default 10
-  publisher_queue: 6        # Default 10
-  lazy: true                # Default "false"
-  direction: BIDIRECTIONAL  # Default "BIDIRECTIONAL" - Bridge both directions
-                            # "GZ_TO_ROS" - Bridge Ignition topic to ROS
-                            # "ROS_TO_GZ" - Bridge ROS topic to Ignition
-```
-
-To run the bridge node with the above configuration:
-```bash
-ros2 run ros_gz_bridge parameter_bridge --ros-args -p config_file:=$WORKSPACE/ros_gz/ros_gz_bridge/test/config/full.yaml
-```
-
-## API
-
-ROS 2 Parameters:
-
- * `subscription_heartbeat` - Period at which the node checks for new subscribers for lazy bridges.
- * `config_file` - YAML file to be loaded as the bridge configuration
+## Project Template
+[A template project integrating ROS and Gazebo simulator](https://github.com/gazebosim/ros_gz_project_template)
